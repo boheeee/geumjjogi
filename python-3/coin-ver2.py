@@ -11,12 +11,18 @@ gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
 blr = cv2.GaussianBlur(gray, (0, 0), 1)
 
 # Circle detection
-circles = cv2.HoughCircles(blr, cv2.HOUGH_GRADIENT, 1, 20, param1=150, param2=40, minRadius=10, maxRadius=100)
+circles = cv2.HoughCircles(blr, cv2.HOUGH_GRADIENT, 1, 30, param1=130, param2=40, minRadius=15, maxRadius=100)
 
 sum_of_money = 0
 dst = src.copy()
 
-# 원 검출 결과 및 동전 금액 출력
+coin_1=0
+coin_2=0
+coin_3=0
+coin_4=0
+
+
+# Output Results
 if circles is not None:
     for i in range(circles.shape[1]):
         cx, cy, radius = circles[0][i]
@@ -51,7 +57,7 @@ if circles is not None:
 
         cv2.putText(crop, str(won), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
 
-cv2.putText(dst, str(sum_of_money) + ' won', (40, 80), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
+cv2.putText(dst, str(sum_of_money) + ' won', (20, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
 
 cv2.imshow('src', src)
 cv2.imshow('dst', dst)
