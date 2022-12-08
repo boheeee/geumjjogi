@@ -1,94 +1,72 @@
 import cv2
-import numpy as np 
-import pytesseract 
-from PIL import Image
+import numpy as np
 
-class Recognition:
-    def ExtractNumber(self):
-        Number='16.png'
-        img=cv2. imread (Number, cv2. IMREAD_COLOR ) 
-        img=cv2.resize(img, None, fx=1.1, fy = 1.1) 
-        copy_img=img.copy() 
-        img2 = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-        blur = cv2. GaussianBlur (img2, (3,3), 0)
-        canny= cv2.Canny(blur, 100,200) 
-        cv2.imshow('canny.png', canny)
-        contours,hierarchy = cv2. findContours(canny, cv2.RETR_TREE, cv2. CHAIN_APPROX_SIMPLE)
-        box1=[] 
-        f_count = 0
-        selected = 0
-        plate_width=0
-        
-        for i in range(len(contours)):
-            cnt = contours [i]
-            area = cv2.contourArea(cnt)
-            x,y,w, h = cv2.boundingRect (cnt)
-            rect_area=w*h 
-            aspect_ratio = float (w)/h # ratio - width/height
+# Image Read
+src = cv2.imread('coin3.jpg')
+
+# Convert Image to Gray
+gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+
+#Apply Gaussian filter
+blr = cv2.GaussianBlur(gray, (0, 0), 1)
+
+# Circle detection
+circles = cv2.HoughCircles(blr, cv2.HOUGH_GRADIENT, 1, 30, param1=130, param2=40, minRadius=15, maxRadius=100)
+
+sum_of_money = 0
+dst = src.copy()
+
+coin_1=0
+coin_2=0
+coin_3=0
+coin_4=0
+
+
+# Output Results
+if circles is not None:
+    for i in range(circles.shape[1]):
+        cx, cy, radius = circles[0][i]
+        cv2.circle(dst, (int(cx), int(cy)), int(radius), (0, 0, 255), 2, cv2.LINE_AA)
+
+        # 동전 영역 부분 영상 추출
+        x1 = int(cx - radius)
+        y1 = int(cy - radius)
+        x2 = int(cx + radius)
+        y2 = int(cy + radius)
+        radius = int(radius)
+
+        crop = dst[y1:y2, x1:x2, :]
+        ch, cw = crop.shape[:2]
+
+        # 동전 영역에 대한 ROI 마스크 영상 생성
+        mask = np.zeros((ch, cw), np.uint8)
+        cv2.circle(mask, (cw//2, ch//2), radius, 255, -1)
+
+        # 동전 영역 Hue 색 성분을 +40 시프트하고, Hue 평균을 계산
+        hsv = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+        hue, _, _ = cv2.split(hsv)
+        hue_shift = (hue + 40) % 180
+        mean_of_hue = cv2.mean(hue_shift, mask)[0]
+
+        # Hue 평균이 90보다 작으면 10원, 90보다 크면 100원으로 간주.
+        won = 0
+        if mean_of_hue < 80 and mean_of_hue > 70  :
+            won = 50
+        elif mean_of_hue > 80 and mean_of_hue < 170:
+            won = 100
+        elif mean_of_hue >= 170:
+            won = 500
+        elif mean_of_hue <= 70:
+            won = 10
             
-            if (aspect_ratio>=0.2)and(aspect_ratio<=1.0)and(rect_area>=100)and(rect_area<=400):
-                cv2.rectangle(img, (x,y), (x+w,y+h), (0, 255,0) , 1) 
-                box1.append(cv2.boundingRect(cnt))
 
-        for i in range(len(box1)): ##Buble Sort on python
-            for j in range(len (box1)-(i+1)):
-                if box1[j][0]>box1[j+1][0]:
-                    temp=box1[j]
-                    box1[j] =box1[j+1] 
-                    box1[j+1]=temp
-                    
-        #to find number plate measuring length between rectangles
-        for m in range(len(box1)):
-            count=0
-            for n in range(m+1,(len(box1) -1)):       
-                delta_x=abs(box1[n+1][0]-box1[m][0])
-                if delta_x > 150:
-                    break
-                delta_y =abs(box1 [n+1][1]-box1[m][1])
-                if delta_x ==0:
-                    delta_x=1
-                if delta_y ==0:
-                    delta_y=1
-                gradient =float (delta_y) /float (delta_x)
-                if gradient < 0.25:
-                    count=count+1
-#measure number plate size 
-            if count > f_count:
-                select = m
-                f_count = count;
-                plate_width=delta_x
-                
-        cv2.imshow('snake.png', img)
-        
-        number_plate=copy_img[box1[select][1]-10:box1[select][3]+box1[select][1]+20,box1[select][0]-10:140+box1[select][0]]
-        resize_plate=cv2.resize(number_plate, None, fx=1.8, fy=1.8, interpolation=cv2.INTER_CUBIC+cv2.INTER_LINEAR) 
-        plate_gray=cv2.cvtColor(resize_plate, cv2.COLOR_BGR2GRAY)
-        ret, th_plate = cv2.threshold(plate_gray, 120, 255, cv2. THRESH_BINARY)
-        
-        kernel = np.ones((3,3),np.uint8)
-        er_plate = cv2.erode (th_plate, kernel, iterations=1)
-        er_plate = cv2.dilate(er_plate, kernel, iterations=1)
-        
-        er_invplate = er_plate
-        cv2.imrite('er_plate.png',er_invplate)
-        cv2.imshow ('er_plate.png' ,er_invplate)
-        result = pytesseract.image_to_string(Image.open('er_plate.png'), lang='kor')
-        li = list(result)
-        
-        for number in range(len(li)):
-            if number > 7:
-                li[number] = ' '
-                continue
-            if li[number].isalpha():
-                continue
-            if li[number].isdigit():
-                continue
-            else:
-                li[number] = ' '
-        result = ''.join(li)
-        return (result.replace(" ",""))
-    
-recogtest = Recognition()
-result = recogtest.ExtractNumber()
-    
-print(result)
+        sum_of_money += won
+
+        cv2.putText(crop, str(won), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
+
+cv2.putText(dst, str(sum_of_money) + ' won', (20, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
+
+cv2.imshow('src', src)
+cv2.imshow('dst', dst)
+cv2.waitKey()
+cv2.destroyAllwindows()
