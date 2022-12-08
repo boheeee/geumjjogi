@@ -4,23 +4,32 @@ import matplotlib.pyplot as plt
 import pytesseract
 plt.style.use('dark_background')
 
-img_ori = cv2.imread('car.png')
+img_ori = cv2.imread('car2.jpg')
 
+# 해당 이미지의 높이, 너비, 채널의 값 확인
 height, width, channel = img_ori.shape
-plt.figure(figsize=(12, 10))
-plt.imshow(img_ori,cmap='gray')
+
+# 그래프의 사이즈를 설정
+#plt.figure(figsize=(12, 10))
+#plt.imshow(img_ori,cmap='gray')
 print(height, width, channel)
 
 
-print(height, width, channel)
+#print(height, width, channel)
 
+# 이미지를 그레이로 변환
 gray = cv2.cvtColor(img_ori, cv2.COLOR_BGR2GRAY)
-plt.figure(figsize=(12,10))
-plt.imshow(gray, cmap='gray')
 
-plt.show()
+#plt.figure(figsize=(12,10))
+#plt.imshow(gray, cmap='gray')
+
+# figure 초기화 -> 그래프 새로 생성하기 위해
+#plt.show()
+
+# 가우시안 필터
 img_blurred = cv2.GaussianBlur(gray, ksize=(5, 5), sigmaX=0)
 
+#(src, 임계값, thresholding value 계산방법, threshold, blockSize, 평균이나 가중평균에서 차감할 값)
 img_blur_thresh = cv2.adaptiveThreshold(
     img_blurred,
     maxValue=255.0,
@@ -38,16 +47,18 @@ img_thresh = cv2.adaptiveThreshold(
     C=9
 )
 
-plt.figure(figsize=(20,20))
-plt.subplot(1,2,1)
-plt.title('Threshold only')
-plt.imshow(img_thresh, cmap='gray')
-plt.subplot(1,2,2)
-plt.title('Blur and Threshold')
-plt.imshow(img_blur_thresh, cmap='gray')
+
+#plt.figure(figsize=(20,20))
+#여러 그래프 생성
+#plt.subplot(1,2,1)
+#plt.title('Threshold only')
+#plt.imshow(img_thresh, cmap='gray')
+#plt.subplot(1,2,2)
+#plt.title('Blur and Threshold')
+#plt.imshow(img_blur_thresh, cmap='gray')
 
 
-
+# 윤곽선 검출
 contours, _ = cv2.findContours(
     img_blur_thresh,
     mode=cv2.RETR_LIST,
@@ -56,9 +67,11 @@ contours, _ = cv2.findContours(
 
 temp_result = np.zeros((height, width, channel), dtype=np.uint8)
 
+# 윤곽선 그리기
 cv2.drawContours(temp_result, contours=contours, contourIdx=-1, color=(255,255,255))
-plt.figure(figsize=(12, 10))
-plt.imshow(temp_result)
+#plt.figure(figsize=(12, 10))
+#plt.imshow(temp_result)
+
 
 
 temp_result = np.zeros((height, width, channel), dtype=np.uint8)
@@ -66,7 +79,9 @@ temp_result = np.zeros((height, width, channel), dtype=np.uint8)
 contours_dict = []
 
 for contour in contours:
+# 주어진 점을 감싸는 최소 크기 사각형을 반환
     x, y, w, h = cv2.boundingRect(contour)
+# 도형을 그림
     cv2.rectangle(temp_result, pt1=(x, y), pt2=(x + w, y + h), color=(255, 255, 255), thickness=2)
 
     contours_dict.append({
@@ -78,8 +93,8 @@ for contour in contours:
         'cx': x + (w / 2),
         'cy': y + (h / 2)
     })
-plt.figure(figsize=(12,10))
-plt.imshow(temp_result, cmap='gray')
+#plt.figure(figsize=(12,10))
+#plt.imshow(temp_result, cmap='gray')
 
 
 MIN_AREA = 80
@@ -106,9 +121,9 @@ for d in possible_contours:
     cv2.rectangle(temp_result, pt1=(d['x'], d['y']), pt2=(d['x'] + d['w'], d['y'] + d['h']), color=(255, 255, 255),
                   thickness=2)
 
-plt.figure(figsize=(12, 10))
-plt.imshow(temp_result, cmap='gray')
-plt.show()
+#plt.figure(figsize=(12, 10))
+#plt.imshow(temp_result, cmap='gray')
+#plt.show()
 
 MAX_DIAG_MULTIPLYER = 5
 MAX_ANGLE_DIFF = 12.0
