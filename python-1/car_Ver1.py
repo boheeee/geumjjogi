@@ -6,21 +6,30 @@ plt.style.use('dark_background')
 
 img_ori = cv2.imread('car.png')
 
+# 해당 이미지의 높이, 너비, 채널의 값 확인
 height, width, channel = img_ori.shape
-plt.figure(figsize=(12, 10))
-plt.imshow(img_ori,cmap='gray')
+
+# 그래프의 사이즈를 설정
+#plt.figure(figsize=(12, 10))
+#plt.imshow(img_ori,cmap='gray')
 print(height, width, channel)
 
 
-print(height, width, channel)
+#print(height, width, channel)
 
+# 이미지를 그레이로 변환
 gray = cv2.cvtColor(img_ori, cv2.COLOR_BGR2GRAY)
-plt.figure(figsize=(12,10))
-plt.imshow(gray, cmap='gray')
 
-plt.show()
+#plt.figure(figsize=(12,10))
+#plt.imshow(gray, cmap='gray')
+
+# figure 초기화 -> 그래프 새로 생성하기 위해
+#plt.show()
+
+# 가우시안 필터
 img_blurred = cv2.GaussianBlur(gray, ksize=(5, 5), sigmaX=0)
 
+#(src, 임계값, thresholding value 계산방법, threshold, blockSize, 평균이나 가중평균에서 차감할 값)
 img_blur_thresh = cv2.adaptiveThreshold(
     img_blurred,
     maxValue=255.0,
@@ -37,6 +46,7 @@ img_thresh = cv2.adaptiveThreshold(
     blockSize=19,
     C=9
 )
+
 
 plt.figure(figsize=(20,20))
 plt.subplot(1,2,1)
@@ -59,6 +69,7 @@ temp_result = np.zeros((height, width, channel), dtype=np.uint8)
 cv2.drawContours(temp_result, contours=contours, contourIdx=-1, color=(255,255,255))
 plt.figure(figsize=(12, 10))
 plt.imshow(temp_result)
+
 
 
 temp_result = np.zeros((height, width, channel), dtype=np.uint8)
