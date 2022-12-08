@@ -1,5 +1,7 @@
+
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Image Read
 src = cv2.imread('coins1.jpg')
@@ -26,7 +28,7 @@ coin_4=0
 if circles is not None:
     for i in range(circles.shape[1]):
         cx, cy, radius = circles[0][i]
-        cv2.circle(dst, (int(cx), int(cy)), int(radius), (0, 0, 255), 2, cv2.LINE_AA)
+       # cv2.circle(dst, (int(cx), int(cy)), int(radius), (0, 0, 255), 2, cv2.LINE_AA)
 
         # 동전 영역 부분 영상 추출
         x1 = int(cx - radius)
@@ -49,17 +51,28 @@ if circles is not None:
         mean_of_hue = cv2.mean(hue_shift, mask)[0]
 
         # Hue 평균이 90보다 작으면 10원, 90보다 크면 100원으로 간주.
-        won = 100
+        won1 = 100
+        won2 = 10
         if mean_of_hue < 90:
-            won = 10
+            cv2.circle(dst, (int(cx), int(cy)), int(radius), (0,0,255), 2, cv2.LINE_AA)
+            cv2.putText(crop, str(won2), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0,0,255), 2, cv2.LINE_AA)
+            sum_of_money+=won2
+        else:
+            cv2.circle(dst, (int(cx), int(cy)), int(radius), (255,0,0), 2, cv2.LINE_AA)
+            cv2.putText(crop, str(won1), (30,20), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255,0,0), 2, cv2.LINE_AA)
+            sum_of_money+=won1
 
-        sum_of_money += won
+if circles is not None:
+    circles=np.uint16(np.around(circles))
+    for i in circles[0,:]:
+        cv2.circle(dst, (i[0], i[1]), 2, (128, 206, 225), 5)
 
-        cv2.putText(crop, str(won), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 0, 0), 2, cv2.LINE_AA)
+font={'family' : 'serif', 'color' : 'black', 'weight' : 'bold', 'size' : 20}
 
-cv2.putText(dst, str(sum_of_money) + ' won', (20, 60), cv2.FONT_HERSHEY_DUPLEX, 2, (255, 0, 0), 2, cv2.LINE_AA)
-
-cv2.imshow('src', src)
-cv2.imshow('dst', dst)
-cv2.waitKey()
-cv2.destroyAllwindows()
+plt.figure(figsize=(20,20))
+plt.subplot(1,1,1)
+plt.title('Result', fontsize=45)
+plt.axis("off")
+plt.text(0.1, 0.1, f'sum : {sum_of_money}', fontdict=font, horizontalalignment='left', verticalalignment='bottom')
+plt.imshow(dst)
+plt.show()
