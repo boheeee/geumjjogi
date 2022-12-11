@@ -64,12 +64,12 @@ if circles is not None:
         cv2.circle(dst, (i[0], i[1]), 2, (0, 255, 0), 5)
 
 # Design
-font={'family' : 'serif', 'color' : 'black', 'weight' : 'bold', 'size' : 20}
+font={'family' : 'serif', 'color' : 'black', 'weight' : 'bold', 'size' : 18}
 title_font={'fontweight' : 'bold', 'family' : 'serif'}
 
 plt.figure("Team 7 - geumjjogi", figsize=(20,20))
 plt.subplot(1,1,1)
 plt.title('Result', fontsize=45, pad = 15, fontdict = title_font)
-plt.text(0.1, 0.1, f'Sum : {sum_of_money}', fontdict=font, horizontalalignment='left', verticalalignment='bottom')
+plt.text(0.1, 0.1, f'Sum : {sum_of_money}won', fontdict=font, horizontalalignment='left', verticalalignment='bottom')
 plt.imshow(dst)
 plt.show()
