@@ -19,4 +19,7 @@ So we added, with our own ingenuity, to tell the coordinates of the centroid of 
 ![result1](https://user-images.githubusercontent.com/112920105/207075277-1ea9719d-a266-4a5e-a24a-f65a344a496c.png)
 The picture above is the result window that you see when you run the code.\
 At the top of the picture, it says SUM: and it represents the sum.\
-It recognizes 100 won and 10 won separately, and the coordinates come out well.\
+It recognizes 100 won and 10 won separately, and the coordinates come out well.
+
+## The limitations:
+
