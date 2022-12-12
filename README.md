@@ -23,5 +23,6 @@ At the top of the picture, it says SUM: and it represents the sum.\
 It recognizes 100 won and 10 won separately, and the coordinates come out well.
 
 ## The limitations:
-Only 100 won and 10 won can be distinguished.\
+Only 100 won and 10 won can be distinguished.
+Real-time recognition is not possible. => Only pictures taken are possible.
 
