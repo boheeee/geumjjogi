@@ -11,9 +11,10 @@ So we added, with our own ingenuity, to tell the coordinates of the centroid of 
 2. opencv(4.6.0)
 3. numpy(1.23.5)
 4. matplotlib(3.6.2)
+5. image (coin1.jpg)
 
 ## How to execute:
-
+Carefully execute code on photo path
 
 ## Result:
 ![result1](https://user-images.githubusercontent.com/112920105/207075277-1ea9719d-a266-4a5e-a24a-f65a344a496c.png)
@@ -22,4 +23,5 @@ At the top of the picture, it says SUM: and it represents the sum.\
 It recognizes 100 won and 10 won separately, and the coordinates come out well.
 
 ## The limitations:
+Only 100 won and 10 won can be distinguished.\
 
